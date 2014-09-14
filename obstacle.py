@@ -5,10 +5,16 @@ class Obstacle:
         # A list of points, in CW order
         self.points = points
         self.lines = []
+        self.centroid = computeCentroid(points)
         self.xmin, self.xmax = findXMinMax(points)
         self.ymin, self.ymax = findYMinMax(points)
         self.normals = self.computeNormals()
         self.draw()
+
+    def computeCentroid(points):
+        x = sum(point[0] for point in points) / len(points)
+        y = sum(point[1] for point in points) / len(points)
+        return np.array([x, y])
         
 
     def findXMinMax(points):
@@ -56,3 +62,10 @@ class Obstacle:
         # check axis aligned box for the shape
         if x < self.xmin or x > self.xmax or y < self.ymin or y > self.ymax:
             return False
+
+        # now check the normals
+        vector = np.array([x,y])
+        dotProducts = set(map(self.normals, lambda x: np.dot(x, vector) > 0))
+        if len(dotProducts) == 1:
+            return dotProducts[0]
+        return False
