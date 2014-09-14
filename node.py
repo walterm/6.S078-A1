@@ -18,10 +18,10 @@ class SearchNode:
         for(dx, dy) in [(1,0), (0,1), (-1,0), (0-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
             nx, ny = x+dx, y+dy
             if nx > 0 and ny > 0 and nx < width and ny < height:
-                out.append(SearchNode((nx,ny), self, self.cost+1.0))
+                out.append(SearchNode((nx,ny), self))
         return children
 
-def searc(init, goal, dfs=False):
+def search(init, goal, dfs=False):
     if init == goal:
         return [init]
     else:
