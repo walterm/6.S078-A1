@@ -49,3 +49,23 @@ def search(init, goal, dfs=False):
                     if child.state not in visited:
                         agenda.append(child)
     return None
+
+def dijkstra(init, goal):
+    def euclidean(a,b):
+        x1, y1 = a.state
+        x2, y2 = b.state
+        return (((x2 - x1) ** 2) + ((y2 - y1) ** 2)) ** 0.5
+    # Source -> source distance = 0
+    dist = {tuple(init): 0}
+    previous = {}
+    # how to get the "graph" set up in the PQ?
+    pq = PriorityQueue()
+
+    while not pq.isEmpty():
+        u = pq.pop()
+        for child in u:
+            d = dist[tuple(u.state)] + euclidean(u, child)
+            if d < dist[tuple(v.state)]:
+                dist[tuple(v.state)] = d
+                previous[tuple(v.state)] = u
+    return dist, previous
