@@ -1,4 +1,5 @@
 import numpy as np
+from math import atan2
 class Obstacle:
     def __init__(self, window, points):
         self.window = window
@@ -39,12 +40,14 @@ class Obstacle:
             pt2_x, pt2_y = pt2
             self.window.drawPoint(pt1_x, pt1_y)
             self.window.drawPoint(pt2_x, pt2_y)
-            self.window.drawLineSeg(pt1_x, pt1_y, pt2_x, pt2_y)
+            self.window.drawLineSeg(pt1_x, pt1_y, pt2_x, pt2_y, color="red", width=10)
             self.window.update()
 
     def computeNormals(self):
         normals = []
         lastIndex = len(self.points) - 1
+        #Sorting points in CCW order
+        self.points = sorted(self.points, lambda x: np.atan2(np.array([x[0], x[1], self.centroid])) )
         for i in range(len(self.points)):
             if i == lastIndex:
                 pt1, pt2 = self.points[i], self.points[0]
