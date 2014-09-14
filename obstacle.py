@@ -22,4 +22,17 @@ class Obstacle:
             self.window.update()
 
     def computeNormals(self):
-        return None
+        normals = []
+        lastIndex = len(self.points) - 1
+        for i in range(len(self.points)):
+            if i == lastIndex:
+                pt1, pt2 = self.points[i], self.points[0]
+            else: pt1, pt2 = self.points[i], self.points[i+1]
+            pt1_x, pt1_y = pt1
+            pt2_x, pt2_y = pt2
+
+            vector = np.array([ (pt2_x - pt1_x) / 2, (pt2_y - pt1_y) / 2])
+            # the normal of a vector is [-b, a]
+            normal = np.array([ -vector[1], vector[0] ])
+            normals.append(normal)
+        return normals
