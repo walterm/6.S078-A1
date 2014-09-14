@@ -69,3 +69,21 @@ def dijkstra(init, goal):
                 dist[tuple(v.state)] = d
                 previous[tuple(v.state)] = u
     return dist, previous
+
+def search(init, goal, heuristic=lambda s: 0):
+    if init == goal:
+        return [init]
+    else:
+        agenda = [ (SearchNode(init), init.cost + heuristic(init.state)) ]
+        visited = set(init)
+        while len(agenda):
+            agenda.sort(key=lambda n: n[1])
+            node, cost = agenda.pop(0)
+            if node.state not in visited:
+                visited.add(node.state)
+                if node.state == goal:
+                    return node.getPath()
+                for child in node.getChildren():
+                    if child.state not in visited:
+                        agenda.append( (child, child.cost + heuristic(child.state))
+    return None
