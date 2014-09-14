@@ -5,10 +5,11 @@ class Obstacle:
         # A list of points, in CW order
         self.points = points
         self.lines = []
-        self.normals = self.computeNormals()
-        self.draw()
         self.xmin, self.xmax = findXMinMax(points)
         self.ymin, self.ymax = findYMinMax(points)
+        self.normals = self.computeNormals()
+        self.draw()
+        
 
     def findXMinMax(points):
         sorted_points = sorted(points, key=lambda x: x[0])
@@ -50,3 +51,8 @@ class Obstacle:
             normal = np.array([ -vector[1], vector[0] ])
             normals.append(normal)
         return normals
+
+    def containsPoint(self, (x,y)):
+        # check axis aligned box for the shape
+        if x < self.xmin or x > self.xmax or y < self.ymin or y > self.ymax:
+            return False
