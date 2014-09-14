@@ -7,6 +7,20 @@ class Obstacle:
         self.lines = []
         self.normals = self.computeNormals()
         self.draw()
+        self.xmin, self.xmax = findXMinMax(points)
+        self.ymin, self.ymax = findYMinMax(points)
+
+    def findXMinMax(points):
+        sorted_points = sorted(points, key=lambda x: x[0])
+        xmin = sorted_points[0][0]
+        xmax = sorted_points[-1][0]
+        return (xmin, xmax)
+
+    def findYMinMax(points):
+        sorted_points = sorted(points, key=lambda x: x[1])
+        ymin = sorted_points[0][1]
+        ymax = sorted_points[-1][1]
+        return (ymin, ymax)
 
     def draw(self):
         lastIndex = len(self.points) - 1
