@@ -1,3 +1,14 @@
+class PriorityQueue:
+    def __init__(self):
+        self.data = []
+    def push(self, item, cost):
+        self.data.append((cost, item))
+    def pop(self):
+        (index, cost) = util.argmaxIndex(self.data, lambda (c, x): -c)
+        return self.data.pop(index)[1] # just return the data item
+    def isEmpty(self):
+        return self.data is []
+
 class SearchNode:
     def __init__(self, state, parent=None, cost=1):
         self.state = state
