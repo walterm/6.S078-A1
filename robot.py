@@ -11,7 +11,7 @@ class Robot:
 	def getWindow(self):
 		return self.window
 
-	def redraw(self):
+	def __redraw(self):
 		x,y = self.ref
 		self.window.delete(self.body)
 		self.body = self.window.drawRect((x,y),(x + self.length, y+self.length))
@@ -19,4 +19,4 @@ class Robot:
 
 	def update(self, (x,y)):
 		self.ref = (x,y)
-		self.redraw()
+		self.__redraw()
