@@ -15,11 +15,11 @@ if __name__ == "__main__":
     delta_x = window.windowWidth / grid_size
     delta_y = window.windowHeight / grid_size
 
-    r.setLocation((0,0))
+    robot.setLocation((0,0))
 
     goal = [15, 15]
 
-    robot.plan = node.search(r.location, goal)
+    robot.plan = node.search(robot.loc, goal)
     obstacles = [o]
 
     while robot.getLocation() != goal:
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         elif direction is "down":
             pointsToCheck = [ (targetx, ny) for ny in range(y0, targety) ]
         else:
-            pointsToCheck = [ (targetx, ny) for ny in range(targety, y0, -1) ]]
+            pointsToCheck = [ (targetx, ny) for ny in range(targety, y0, -1) ]
 
 
         for obs in obstacles:

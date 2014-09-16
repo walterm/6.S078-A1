@@ -23,13 +23,14 @@ class SearchNode:
             current = current.parent
         return path[::-1]
 
-    def getChildren(self, width, height):
+    def getChildren(self):
+        grid_size = 20
         x, y = self.state
         children = []
         for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
             nx, ny = x+dx, y+dy
-            if nx > 0 and ny > 0 and nx < width and ny < height:
-                out.append(SearchNode((nx,ny), self))
+            if nx > 0 and ny > 0 and nx < grid_size and ny < grid_size:
+                children.append(SearchNode((nx,ny), self))
         return children
 
 class BadLocations:
