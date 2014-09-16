@@ -24,7 +24,7 @@ class SearchNode:
         return path[::-1]
 
     def getChildren(self):
-        grid_size = 20
+        grid_size = 5
         x, y = self.state
         children = []
         for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
@@ -36,25 +36,31 @@ class SearchNode:
 class BadLocations:
     badlocs = []
 
-    def isBadLoc(position):
-        return position in badlocs
+    @classmethod
+    def isBadLoc(cls,position):
+        return position in cls.badlocs
 
+    @staticmethod
     def addBadLoc(position):
         badlocs.append(position)
 
 
 def search(init, goal, dfs=False):
+    def __goalTest(test, goal):
+        return goal[0] == test[0] and goal[1] == test[1]
     if init == goal:
         return [init]
     else:
         agenda = [SearchNode(init)]
-        visited = set(init)
-        while len(agenda):
+        visited = set( init )
+        while len(agenda) != 0:
             #BFS uses a queue, DFS uses a stack
             node = agenda.pop(0) if not dfs else agenda.pop()
             if node.state not in visited:
                 visited.add(node.state)
-                if node.state == goal:
+                print node.state is tuple(goal)
+                if __goalTest(goal, node.state):
+                    print "Found path!"
                     return node.getPath()
                 for child in node.getChildren():
                     if child.state not in visited and not BadLocations.isBadLoc(child.state):

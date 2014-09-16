@@ -7,6 +7,9 @@ class Robot:
         self.loc = None
         self.plan = None
 
+    def getLocation(self):
+        return self.loc
+        
     def setLocation(self, grid_loc):
         self.loc = grid_loc
 

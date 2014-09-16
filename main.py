@@ -5,21 +5,23 @@ import node
 
 if __name__ == "__main__":
     window = DrawingWindow(800,800,0,800,0,800,"test")
-    pts = [(100,210), (150,350), (250, 300)]
-
+    
+    pts = [(50, 50), (50, 100), (100,100), (100,50)]
     robot = Robot(window, (10,10), pts)
-    pts = [(50, 50), (50, 100), (100,50), (100,100)]
+
+    pts = [(100,210), (150,350), (250, 300)]
     o = Obstacle(window, pts)
 
-    grid_size = 20
+    grid_size = 5
     delta_x = window.windowWidth / grid_size
     delta_y = window.windowHeight / grid_size
 
     robot.setLocation((0,0))
 
-    goal = [15, 15]
+    goal = [1, 1]
 
     robot.plan = node.search(robot.loc, goal)
+    print "First plan", robot.plan
     obstacles = [o]
 
     while robot.getLocation() != goal:
