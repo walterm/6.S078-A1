@@ -4,6 +4,11 @@ class Robot:
         self.points = pts
         self.window = window
         self.body = self.draw()
+        self.loc = None
+        self.plan = None
+
+    def setLocation(self, grid_loc):
+        self.loc = grid_loc
 
     def getWindow(self):
         return self.window

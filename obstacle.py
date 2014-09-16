@@ -1,5 +1,6 @@
 import numpy as np
 from math import atan2
+import sys
 class Obstacle:
     def __init__(self, window, points):
         self.window = window
@@ -51,29 +52,82 @@ class Obstacle:
         self.points = sorted(self.points, key=lambda pt: atan2( (pt[1] - y), (pt[0] - x) ) )
         for i in range(len(self.points)):
             if i == lastIndex:
-                pt1, pt2 = self.points[i], self.points[0]
+                pt1, pt2 = self.points[0], self.points[i]
             else: pt1, pt2 = self.points[i], self.points[i+1]
-            pt1_x, pt1_y = pt1
-            pt2_x, pt2_y = pt2
+            # pt1_x, pt1_y = pt1
+            # pt2_x, pt2_y = pt2
 
-            vector = np.array([ (pt2_x - pt1_x) / 2, (pt2_y - pt1_y) / 2])
-            # the normal of a vector is [-b, a]
-            normal = np.array([ -vector[1], vector[0] ])
-            normals.append(normal)
+            # vector = np.array([ pt2_x - pt1_x, pt2_y - pt1_y])
+            # # the normal of a vector is [-b, a]
+            # if vector[1] != 0:
+            #     normal = np.array([ -vector[1], vector[0] ])
+            # # axis case
+            # else: normal = np.array([vector[1], -vector[0]])
+            # normals.append(normal)
+
+            normals.append([pt1, pt2])
         return normals
 
-    def containsPoint(self, (x,y)):
-        # check axis aligned box for the shape
+    def __raycasting(self, point, edge):
+        _eps = 0.00001
+        _inf = sys.float_info.max
+        _small = sys.float_info.min
+
+        pt1, pt2 = edge
+
+        if pt1[1] > pt2[1]:
+            pt1, pt2 = pt2, pt1
+
+        x,y = point
+
         if x < self.xmin or x > self.xmax or y < self.ymin or y > self.ymax:
             return False
 
-        # now check the normals
-        vector = np.array([x,y])
-
-        dotProducts = []
-        for normal in self.normals:
-            dotProducts.append( np.dot(normal, vector) < 0)
-        dotProducts = set(dotProducts)
-        if len(dotProducts) > 1:
+        if x < min(pt1[0], pt2[0]):
             return True
-        return dotProducts[0]
+
+        if point[1] == pt1[1] or point[1] == pt2[1]:
+            point = [point[0], point[1] + _eps]
+
+        if abs(pt1[0] - pt2[0]) > _small:
+            first_slope = (pt2[1] - pt1[1]) / float(pt2[0] - pt1[0])
+        else: first_slope = _inf
+
+        if abs(pt1[0] - point[0]) > _small:
+            second_slope = (point[1] - pt1[1]) / float(point[0] - pt1[0])
+        else: second_slope = _inf
+
+        return second_slope >= first_slope
+
+    def __isOdd(self, x):
+        return x % 2 == 1
+
+    def containsPoint(self, point):
+
+        # triangle case
+        if len(self.normals) == 3:
+            def sign(p1, p2, p3):
+                return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+
+            test1 = sign(point, self.points[0], self.points[1]) < 0.
+            test2 = sign(point, self.points[1], self.points[2]) < 0.
+            test3 = sign(point, self.points[2], self.points[0]) < 0.
+            return test1 == test2 and test2 == test3
+        return self.__isOdd(sum(self.__raycasting(point, edge) for edge in self.normals))
+
+
+    # def containsPoint(self, (x,y)):
+    #     # check axis aligned box for the shape
+    #     if x < self.xmin or x > self.xmax or y < self.ymin or y > self.ymax:
+    #         return False
+
+    #     # now check the normals
+    #     vector = np.array([x,y])
+    #     print "vector", vector
+    #     for normal in self.normals:
+    #         offset = np.dot(normal, self.points[0])
+    #         print "normal", normal
+    #         print np.dot(normal, vector) - offset
+    #         if np.dot(normal, vector) - offset < 0:
+    #             return True
+    #     return False

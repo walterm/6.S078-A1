@@ -32,6 +32,16 @@ class SearchNode:
                 out.append(SearchNode((nx,ny), self))
         return children
 
+class BadLocations:
+    badlocs = []
+
+    def isBadLoc(position):
+        return position in badlocs
+
+    def addBadLoc(position):
+        badlocs.append(position)
+
+
 def search(init, goal, dfs=False):
     if init == goal:
         return [init]
@@ -52,31 +62,31 @@ def search(init, goal, dfs=False):
 
 import sys
 
-def dijkstra(init, goal):
+def all_points(start, end, grid_width, grid_height):
+    points = [start, end]
+    seen_points = set()
+    while len(points) != 0:
+        x, y = points.pop(0)
+        for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
+            nx, ny = x+dx, y+dy
+            if nx >= 0 and ny >= 0 and nx < grid_width and ny < grid_height:
+                new_point = (nx, ny)
+                if new_point not in seen_points:
+                    seen_points.add(tuple( (nx, ny) ) )
+                    points.append([nx,ny])
+    return seen_points
+
+def dijkstra(init, goal, grid):
     def euclidean(a,b):
         x1, y1 = a.state
         x2, y2 = b.state
         return (((x2 - x1) ** 2) + ((y2 - y1) ** 2)) ** 0.5
 
-    def all_points(start, end, grid_width, grid_height):
-        points = [start, end]
-        seen_points = set()
-        while len(points) != 0:
-            x, y = points.pop(0)
-            for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
-                nx, ny = x+dx, y+dy
-                if nx > 0 and ny > 0 and nx < width and ny < height:
-                    new_point = (nx, ny)
-                    if new_point not in seen_points:
-                        seen_points.add(tuple(nx, ny))
-                        points.add([nx,ny])
-        return seen_points
-
     # Source -> source distance = 0
     dist = {tuple(init): 0}
     previous = {}
-    points = all_points(init, goal, 0, 100)
-    for point in points:
+    
+    for point in grid:
         dist[point] = float("inf")
 
     pq = PriorityQueue()
@@ -90,7 +100,7 @@ def dijkstra(init, goal):
                 previous[tuple(v.state)] = u
     return dist, previous
 
-def search(init, goal, heuristic=lambda s: 0):
+def ucSearch(init, goal, heuristic=lambda s: 0):
     if init == goal:
         return [init]
     else:
@@ -105,5 +115,5 @@ def search(init, goal, heuristic=lambda s: 0):
                     return node.getPath()
                 for child in node.getChildren():
                     if child.state not in visited:
-                        agenda.append( (child, child.cost + heuristic(child.state))
+                        agenda.append( (child, child.cost + heuristic(child.state ) ))
     return None
