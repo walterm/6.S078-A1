@@ -10,22 +10,6 @@ class Robot:
         self.plan = None
         self.deltas = deltas
 
-    def __redraw(self):
-        x,y = self.ref
-        for elem in self.body:
-            self.window.delete(elem)
-        self.body = self.draw()
-
-    def update(self, (x,y)):
-        delta_x = x - self.ref[0]
-        delta_y = y - self.ref[1]
-        self.ref = (x,y)
-        print self.points
-        for i in range(len(self.points)):
-            self.points[i] = (self.points[i][0] + delta_x, self.points[i][1] + delta_y )
-        print self.points
-        self.__redraw()
-
     def draw(self):
         if self.body != None:
             for elem in self.body:
@@ -44,9 +28,12 @@ class Robot:
         self.window.update()
         self.body = body
 
-
     def translate(self, x, y):
         translated = [ (point[0] + x * self.deltas[0], point[1] + y * self.deltas[1]) for point in self.original]
         self.points = translated
         self.loc = (x,y)
         self.draw()
+
+    def potentialPoints(self, x, y):
+        translated = [ (point[0] + x, point[1] + y) for point in self.points]
+        return translated

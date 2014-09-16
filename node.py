@@ -1,3 +1,10 @@
+# def validNeighbors(i, j, grid_size):
+#     neighbors
+#     for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
+#         nx, ny = x+dx, y+dy
+#         if nx >= 0 and ny >= 0 and nx < grid_size and ny < grid_size:
+            
+
 class PriorityQueue:
     def __init__(self):
         self.data = []
@@ -24,7 +31,7 @@ class SearchNode:
         return path[::-1]
 
     def getChildren(self):
-        grid_size = 5
+        grid_size = 50
         x, y = self.state
         children = []
         for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
@@ -34,20 +41,21 @@ class SearchNode:
         return children
 
 class BadLocations:
-    badlocs = []
+    badlocs = set()
 
     @classmethod
     def isBadLoc(cls,position):
-        return position in cls.badlocs
+        return tuple(position) in cls.badlocs
 
-    @staticmethod
-    def addBadLoc(position):
-        badlocs.append(position)
+    @classmethod
+    def addBadLoc(cls,position):        
+        cls.badlocs.add(tuple(position))
 
 
 def search(init, goal, dfs=False):
     def __goalTest(test, goal):
         return goal[0] == test[0] and goal[1] == test[1]
+
     if init == goal:
         return [init]
     else:
@@ -56,13 +64,13 @@ def search(init, goal, dfs=False):
         while len(agenda) != 0:
             #BFS uses a queue, DFS uses a stack
             node = agenda.pop(0) if not dfs else agenda.pop()
+            node.state = tuple(node.state)
             if node.state not in visited:
                 visited.add(node.state)
-                print node.state is tuple(goal)
                 if __goalTest(goal, node.state):
-                    print "Found path!"
                     return node.getPath()
                 for child in node.getChildren():
+                    child.state = tuple(child.state)
                     if child.state not in visited and not BadLocations.isBadLoc(child.state):
                         agenda.append(child)
     return None
