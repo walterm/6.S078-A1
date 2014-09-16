@@ -56,7 +56,7 @@ def search(init, goal, dfs=False):
                 if node.state == goal:
                     return node.getPath()
                 for child in node.getChildren():
-                    if child.state not in visited:
+                    if child.state not in visited and not BadLocations.isBadLoc(child.state):
                         agenda.append(child)
     return None
 
