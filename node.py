@@ -36,7 +36,7 @@ class SearchNode:
         children = []
         for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
             nx, ny = x+dx, y+dy
-            if nx > 0 and ny > 0 and nx < grid_size and ny < grid_size:
+            if nx >= 0 and ny >= 0 and nx < grid_size and ny < grid_size:
                 children.append(SearchNode((nx,ny), self))
         return children
 
@@ -56,7 +56,7 @@ def search(init, goal, dfs=False):
     def __goalTest(test, goal):
         return goal[0] == test[0] and goal[1] == test[1]
 
-    if init == goal:
+    if __goalTest(init, goal):
         return [init]
     else:
         agenda = [SearchNode(init)]
@@ -64,6 +64,7 @@ def search(init, goal, dfs=False):
         while len(agenda) != 0:
             #BFS uses a queue, DFS uses a stack
             node = agenda.pop(0) if not dfs else agenda.pop()
+            print "state", node.state
             node.state = tuple(node.state)
             if node.state not in visited:
                 visited.add(node.state)
