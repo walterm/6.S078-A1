@@ -1,20 +1,13 @@
-# def validNeighbors(i, j, grid_size):
-#     neighbors
-#     for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
-#         nx, ny = x+dx, y+dy
-#         if nx >= 0 and ny >= 0 and nx < grid_size and ny < grid_size:
-            
+def getNeighbors(point, grid_size):
+    x, y = point
+    children = []
+    for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
+        nx, ny = x+dx, y+dy
+        if nx >= 0 and ny >= 0 and nx < grid_size and ny < grid_size:
+            children.append((nx,ny))
+    return children       
 
-class PriorityQueue:
-    def __init__(self):
-        self.data = []
-    def push(self, item, cost):
-        self.data.append((cost, item))
-    def pop(self):
-        (index, cost) = util.argmaxIndex(self.data, lambda (c, x): -c)
-        return self.data.pop(index)[1] # just return the data item
-    def isEmpty(self):
-        return self.data is []
+from Queue import PriorityQueue
 
 class SearchNode:
     def __init__(self, state, parent=None, cost=1):
@@ -79,7 +72,7 @@ def search(init, goal, dfs=False):
 import sys
 
 def all_points(start, end, grid_width, grid_height):
-    points = [start, end]
+    points = [start]
     seen_points = set()
     while len(points) != 0:
         x, y = points.pop(0)
@@ -92,29 +85,37 @@ def all_points(start, end, grid_width, grid_height):
                     points.append([nx,ny])
     return seen_points
 
-def dijkstra(init, goal, grid):
-    def euclidean(a,b):
-        x1, y1 = a.state
-        x2, y2 = b.state
-        return (((x2 - x1) ** 2) + ((y2 - y1) ** 2)) ** 0.5
+def euclidean(a,b):
+    x1, y1 = a
+    x2, y2 = b
+    return (((x2 - x1) ** 2) + ((y2 - y1) ** 2)) ** 0.5
 
-    # Source -> source distance = 0
-    dist = {tuple(init): 0}
-    previous = {}
-    
+def dijkstra(init, goal, grid, grid_size=10):
+    dist = {point: float('inf') for point in grid}
+    previous = {point: None for point in grid}
+    dist[tuple(init)] = 0
+    q = grid.copy()
+    neighbors = {point: set() for point in grid}
     for point in grid:
-        dist[point] = float("inf")
+        for neighbor in getNeighbors(point, grid_size):
+            neighbors[point].add( (neighbor, euclidean(point, neighbor)) )
+    while q:
+        u = min(q, key=lambda vertex: dist[vertex])
+        q.remove(u)
+        if dist[u] == float('inf') or u is init:
+            break
+        for v, cost in neighbors[u]:
+            d = dist[u] + cost
+            if d < dist[v]:
+                dist[v] = d
+                previous[v] = u
+    s, u = [], tuple(goal)
+    while previous[u]:
+        s.insert(0, u)
+        u = previous[u]
+    s.insert(0, u)
+    return s
 
-    pq = PriorityQueue()
-
-    while not pq.isEmpty():
-        u = pq.pop()
-        for child in u:
-            d = dist[tuple(u.state)] + euclidean(u, child)
-            if d < dist[tuple(v.state)]:
-                dist[tuple(v.state)] = d
-                previous[tuple(v.state)] = u
-    return dist, previous
 
 def ucSearch(init, goal, heuristic=lambda s: 0):
     if init == goal:
