@@ -11,7 +11,7 @@ from Queue import PriorityQueue
 
 class SearchNode:
     def __init__(self, state, parent=None, cost=1):
-        self.state = state
+        self.state = tuple(state)
         self.parent = parent
         self.cost = cost
 
@@ -45,9 +45,10 @@ class BadLocations:
         cls.badlocs.add(tuple(position))
 
 
+def __goalTest(test, goal):
+    return goal[0] == test[0] and goal[1] == test[1]
+
 def search(init, goal, dfs=False):
-    def __goalTest(test, goal):
-        return goal[0] == test[0] and goal[1] == test[1]
 
     if __goalTest(init, goal):
         return [init]
@@ -57,7 +58,6 @@ def search(init, goal, dfs=False):
         while len(agenda) != 0:
             #BFS uses a queue, DFS uses a stack
             node = agenda.pop(0) if not dfs else agenda.pop()
-            print "state", node.state
             node.state = tuple(node.state)
             if node.state not in visited:
                 visited.add(node.state)
@@ -121,16 +121,22 @@ def ucSearch(init, goal, heuristic=lambda s: 0):
     if init == goal:
         return [init]
     else:
-        agenda = [ (SearchNode(init), init.cost + heuristic(init.state)) ]
-        visited = set(init)
+        init = SearchNode(init)
+        agenda = [ (init, 1 + heuristic(init.state)) ]
+        visited = set(init.state)
         while len(agenda):
             agenda.sort(key=lambda n: n[1])
             node, cost = agenda.pop(0)
             if node.state not in visited:
                 visited.add(node.state)
-                if node.state == goal:
+                if __goalTest(goal, node.state):
                     return node.getPath()
                 for child in node.getChildren():
                     if child.state not in visited:
                         agenda.append( (child, child.cost + heuristic(child.state ) ))
     return None
+
+if __name__ == "__main__":
+    goal = [7, 7]
+    heuristic = lambda x: 3 * ((x[0] - goal[0]) ** 2 + (x[1] - goal[1]) ** 2)
+    print ucSearch([0,0], goal, heuristic)
