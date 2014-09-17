@@ -1,7 +1,7 @@
 def getNeighbors(point, grid_size):
     x, y = point
     children = []
-    for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
+    for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1)]:
         nx, ny = x+dx, y+dy
         if nx >= 0 and ny >= 0 and nx < grid_size and ny < grid_size:
             children.append((nx,ny))
@@ -27,7 +27,7 @@ class SearchNode:
         grid_size = 50
         x, y = self.state
         children = []
-        for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
+        for(dx, dy) in [(1,0), (0,1), (-1,0), (0,-1)]:
             nx, ny = x+dx, y+dy
             if nx >= 0 and ny >= 0 and nx < grid_size and ny < grid_size:
                 children.append(SearchNode((nx,ny), self))
@@ -57,7 +57,10 @@ def search(init, goal, dfs=False):
         visited = set( init )
         while len(agenda) != 0:
             #BFS uses a queue, DFS uses a stack
-            node = agenda.pop(0) if not dfs else agenda.pop()
+            if dfs:
+                node = agenda.pop()
+            else:
+                node = agenda.pop(0)
             node.state = tuple(node.state)
             if node.state not in visited:
                 visited.add(node.state)
@@ -71,7 +74,7 @@ def search(init, goal, dfs=False):
 
 import sys
 
-def all_points(start, end, grid_width, grid_height):
+def all_points(start, grid_width, grid_height):
     points = [start]
     seen_points = set()
     while len(points) != 0:
@@ -121,9 +124,8 @@ def ucSearch(init, goal, heuristic=lambda s: 0):
     if init == goal:
         return [init]
     else:
-        init = SearchNode(init)
-        agenda = [ (init, 1 + heuristic(init.state)) ]
-        visited = set(init.state)
+        agenda = [ (SearchNode(init), 0) ]
+        visited = set(SearchNode(init).state)
         while len(agenda):
             agenda.sort(key=lambda n: n[1])
             node, cost = agenda.pop(0)
@@ -132,7 +134,7 @@ def ucSearch(init, goal, heuristic=lambda s: 0):
                 if __goalTest(goal, node.state):
                     return node.getPath()
                 for child in node.getChildren():
-                    if child.state not in visited:
+                    if child.state not in visited and not BadLocations.isBadLoc(child.state):
                         agenda.append( (child, child.cost + heuristic(child.state ) ))
     return None
 
